@@ -1,0 +1,172 @@
+<?php
+
+/**
+ *
+ * ProcessWire Module Helper for Typekit´s WebFontLoader.
+ *
+ * @author @biojazzard | alfredo@1un.es | alfredo@tallerdelsoho.es
+ *
+ * @date_created 23/10/2015
+ *
+ * ProcessWire 2.x
+ * Copyright (C) 2015 by Alfredo Llanos
+ * Licensed under MIT License, see LICENSE
+ *
+ * https://github.com/biojazzard/DrLunesTypeManager
+ *
+ */
+
+class DrLunesTypeManager extends WireData implements Module, ConfigurableModule {
+
+  public static function getModuleInfo() {
+    return array(
+      'title' => "Dr Lunes Type Manager.",
+      'summary' => 'Typekit WebFontLoader Manager for PW',
+      'version' => 100,
+      'href' => 'https://github.com/biojazzard/DrLunesTypeManager',
+      'autoload' => false,
+      'singular' => false
+    );
+  }
+
+  public function __construct() {
+    //$this->title = __("Dr Lunes Type Manager.");
+  }
+
+  /**
+  * Blank but, it must be here
+  *
+  */
+
+  public function init() {
+    //$this->title = __("Dr. Lunes Type Manager.");
+  }
+
+  /**
+  * Simple $fonts = $modules->get('DrLunesTypeManager');
+  *
+  */
+
+  public static $defaultOptions = array(
+    'debug' => false
+  );
+
+  /**
+  *
+  *   Init method to load typekit´s WebFontLoader.
+  *
+  *   USE: In templates file:
+  *
+  *   $typekit = $modules->get('DrLunesTypeManager');
+  *   $typekit->render();
+  *
+  */
+
+  public function render(array $options = null) {
+
+    if($options != null && is_array($options)){
+      $options = array_merge(self::$defaultOptions, $options);
+    } else {
+      $options = self::$defaultOptions;
+    }
+
+    $out = '';
+
+    if($options['debug'] == true) {
+      $this->timer = Debug::timer();
+      $out = '<!-- [Dr. Lunes Type Manager]  -->';
+    }
+
+    $this->options = $options;
+    $out.= '<style>'.$this->custom_css.'</style>';
+    $out.= '<script>
+        WebFontConfig = {
+          typekit: { id: "'.$this->typekit.'" },
+          google: {
+              families: ["'.$this->googlefont.'"]
+          }
+        };
+        (function() {
+            var wf = document.createElement("script");
+            wf.src = ("https:" == document.location.protocol ? "https" : "http") + "'.$this->font_cdn.'";
+            wf.async = "true";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(wf, s);
+        })();
+        (function($) {
+          $("p").addClass("'.$this->body_class.'")
+          $("ul").addClass("'.$this->body_class.'")
+          $("h1, h2, h3").addClass("'.$this->h13_class.'")
+          $("h4, h5, h6").addClass("'.$this->h46_class.'")
+        })(jQuery);
+
+        </script>';
+
+    if($options['debug'] == true) {
+      $out .= "<!-- [Dr. Lunes Type Manager [in secs]: " . Debug::timer($this->timer) . "] -->";
+    }
+
+    return $out;
+
+  }
+
+  static public function getModuleConfigInputfields(Array $data) {
+    // this is a container for fields, basically like a fieldset
+    $fields = new InputfieldWrapper();
+
+    // since this is a static function, we can't use $this->modules, so get them from the global wire() function
+    $modules = wire('modules');
+
+    // init val: 'cil7jbc'
+
+    $field = $modules->get("InputfieldText");
+    $field->attr('name', 'typekit');
+    $field->attr('value', $data['typekit']);
+    $field->label = "TypeKit ID";
+    $fields->add($field);
+
+    // init val: '://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js'
+
+    $field = $modules->get("InputfieldText");
+    $field->attr('name', 'font_cdn');
+    $field->attr('value', $data['font_cdn']);
+    $field->label = "WebFontLoader CDN URL";
+    $fields->add($field);
+
+    // init val: 'Montserrat:400,700'
+
+    $field = $modules->get("InputfieldText");
+    $field->attr('name', 'googlefont');
+    $field->attr('value', $data['googlefont']);
+    $field->label = "Google Fonts [Ex: Montserrat:400,700]";
+    $fields->add($field);
+
+    $field = $modules->get("InputfieldText");
+    $field->attr('name', 'body_class');
+    $field->attr('value', $data['body_class']);
+    $field->label = "body CSS class [Ex: tk-futura-pt]";
+    $fields->add($field);
+
+    $field = $modules->get("InputfieldText");
+    $field->attr('name', 'h13_class');
+    $field->attr('value', $data['h13_class']);
+    $field->label = "h1, h2, h3 CSS class [Ex: tk-cubano]";
+    $fields->add($field);
+
+    $field = $modules->get("InputfieldText");
+    $field->attr('name', 'h46_class');
+    $field->attr('value', $data['h46_class']);
+    $field->label = "h4, h5, h6 CSS class [Ex: tk-cubano]";
+    $fields->add($field);
+
+    $field = $modules->get("InputfieldTextarea");
+    $field->attr('name', 'custom_css');
+    $field->attr('value', $data['custom_css']);
+    $field->label = "Custom CSS: [Ex: .tk-futura-tk { line-height: 1.8; font-weight: 700 } ]";
+    $fields->add($field);
+
+    return $fields;
+  }
+
+
+}
