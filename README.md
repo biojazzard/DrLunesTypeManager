@@ -1,6 +1,10 @@
 # DrLunesTypeManager
 ProcessWire Module Helper for Typekit´s WebFontLoader.
 
+DrLunesTypeManager is a Template Helper.
+
+DrLunesTypeManager asks you for a typekit ID, Google Fonts Family, CDN, Custom CSS and more, and outputs the code needed to use this fonts in your templates. It also forces some tags to use this fonts and your custom CSS styles to be applied to the page.
+
 ## Inspiration
 
 Inspired by [Dr. Rober´s](rober@1un.es) needs. 
