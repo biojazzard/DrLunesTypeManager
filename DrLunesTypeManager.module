@@ -77,13 +77,25 @@ class DrLunesTypeManager extends WireData implements Module, ConfigurableModule 
       $out = '<!-- [Dr. Lunes Type Manager]  -->';
     }
 
+    $allfonts = explode("|", $this->googlefont);
+
+    $fam = '';
+
+    foreach ($allfonts as $key => $value) {
+      if ($key == 0) {
+        $fam.= '"'.$value.'"';
+      } else {
+        $fam.= ', "'.$value.'"';
+      }
+    }
+
     $this->options = $options;
     $out.= '<style>'.$this->custom_css.'</style>';
     $out.= '<script>
         WebFontConfig = {
           typekit: { id: "'.$this->typekit.'" },
           google: {
-              families: ["'.$this->googlefont.'"]
+              families: ['.$fam.']
           }
         };
         (function() {
